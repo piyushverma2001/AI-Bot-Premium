@@ -1,12 +1,23 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8080/chat";
+const apiClient = axios.create({
+  baseURL: process.env.REACT_APP_API_URL || "http://127.0.0.1:8080",
+  timeout: 5000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 export const sendMessageToBot = async (message) => {
+  if (!message) {
+    console.error("Message is empty");
+    return "Error: Message cannot be empty";
+  }
+
   try {
-    const response = await axios.post(API_URL, { message });
-    console.log("API Response:", response.data);
-    return response.data.reply;
+    const { data } = await apiClient.post("/chat", { message });
+    console.log("API Response:", data);
+    return data.reply;
   } catch (error) {
     console.error(
       "API Error:",
