@@ -3,7 +3,7 @@ import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-from openai import OpenAI
+import openai
 
 load_dotenv()
 
@@ -12,8 +12,7 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 CORS(app)
 
-api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=api_key)
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/chat", methods=["POST"])
 def handle_chat():
@@ -35,12 +34,12 @@ def handle_chat():
     )
 
     try:
-        api_response = client.chat.completions.create(
+        api_response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",     # Options: gpt-4o, o1, o1-mini
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-            model="gpt-4o",  # Options: gpt-4o || o1 || o1-mini || gpt-4o-mini
             temperature=0.7
         )
         bot_reply = api_response.choices[0].message.content
@@ -51,4 +50,4 @@ def handle_chat():
         return jsonify({"error": f"Open AI Error: {e}"}), 500
 
 if __name__ == "__main__":
-    app.run(debug=os.getenv("FLASK_DEBUG", "False") == "True", port=8080)
+    app.run(port=8080)
