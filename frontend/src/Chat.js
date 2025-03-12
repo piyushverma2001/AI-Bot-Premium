@@ -1,17 +1,26 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { sendMessageToBot } from "./api";
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const handleSend = async () => {
+  // Automatically scroll to the bottom of the chat when messages update
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Send a message to the bot and update the chat accordingly
+  const handleSend = useCallback(async () => {
     if (!input.trim()) return;
 
+    // Add user message and clear the input
     const userMessage = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+    setIsLoading(true);
 
     try {
       const botReply = await sendMessageToBot(input);
@@ -24,15 +33,15 @@ const Chat = () => {
         content: "Error: Unable to get response",
       };
       setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [input]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
+  // Handle Enter key press to send the message
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevents adding a newline
       handleSend();
     }
   };
@@ -54,6 +63,19 @@ const Chat = () => {
             {msg.content}
           </div>
         ))}
+        {isLoading && (
+          <div
+            style={{
+              ...styles.message,
+              alignSelf: "flex-start",
+              backgroundColor: "#e5e5ea",
+              color: "#000",
+              fontStyle: "italic",
+            }}
+          >
+            Loading...
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div style={styles.inputContainer}>
@@ -64,8 +86,15 @@ const Chat = () => {
           onKeyPress={handleKeyPress}
           placeholder="Type a message..."
           style={styles.input}
+          disabled={isLoading}
+          aria-label="Message input"
         />
-        <button onClick={handleSend} style={styles.button}>
+        <button
+          onClick={handleSend}
+          style={{ ...styles.button, opacity: isLoading ? 0.6 : 1 }}
+          disabled={isLoading}
+          aria-label="Send message"
+        >
           Send
         </button>
       </div>

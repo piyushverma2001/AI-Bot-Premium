@@ -1,3 +1,6 @@
+/* App.css */
+
+/* Base container styles */
 .App {
   text-align: center;
   background: linear-gradient(135deg, #1d2b64, #f8cdda);
@@ -9,6 +12,7 @@
   padding: 20px;
 }
 
+/* Logo styling with animation */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -17,6 +21,7 @@
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
 }
 
+/* Header styles with backdrop blur and adaptive text size */
 .App-header {
   background: rgba(0, 0, 0, 0.5);
   padding: 40px;
@@ -31,6 +36,7 @@
   margin-bottom: 20px;
 }
 
+/* Link styling with smooth color transition */
 .App-link {
   color: #ff9f1c;
   text-decoration: none;
@@ -41,6 +47,7 @@
   color: #ffbf69;
 }
 
+/* Keyframes for logo spin animation */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -48,5 +55,20 @@
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .App-header {
+    padding: 20px;
+    font-size: calc(8px + 2vmin);
+  }
+}
+
+/* Accessibility: Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .App-logo {
+    animation: none;
   }
 }
